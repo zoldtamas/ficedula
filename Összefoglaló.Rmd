@@ -1,0 +1,227 @@
+---
+title: "Összefoglaló"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+#Adatok beolvasása
+
+```{r load data}
+load("Flycatchers2018.RData")
+library(ggplot2)
+```
+
+#1. Hogyan növekedtek a fiókák az egyes fészekaljakban?
+Először egy találomra kiválasztott fészek következik, a 122-es.Elsőnek ábrázoltam a fiókák tömegét a koruk függvényében, majd egy regressziós egyenest illesztettem rá.
+``` {r}
+plot(mass~day, data = chck, subset = nestboxid == 122)
+m2=lm(mass~day,data = chck)
+abline(m2)
+summary(m2)
+```
+
+#2. Következőnek kiveszek találomra egy fészket, és megismétlem ugyanezt.Miben változik meg ? Miben hasonlít?
+Nagy eltérések nincsenek,a regresszios egyenes csak kismértékben tér el. A 122-es fészekben eleinte gyorsabban növekedtek, azonban a 12.napra a 115-osok súlya volt a több.
+
+``` {r}
+plot(mass~day, data = chck,subset = nestboxid == 115)
+m3=lm(mass~day,data = chck)
+abline(m3)
+summary(m3)
+```
+# Most pedig összeomlasztom az egész adatsort. Miben tér el?
+Természetesen nagyobb a szórás, több a szélsőséges eset,nagyobb a minimum es maximum értékek elhelyezkedése.
+```{r}
+plot(chck$day,chck$mass, xlab = "Days",ylab = "Mass")
+m1 = lm(mass~day, data = chck)
+abline(m1)
+summary(m1)
+```
+
+
+
+
+Az eredmény szépen kivehető,fokozatosan és egyenletesen növekszik a súlyuk, egészen a 12. napig,miután egy enyhe súlycsökkenés figyelhető meg. Ez azért van mert a testük itt alakul át a fióka állapotból a kifejlett madarakéhoz hasonló testfelépítéshez.. A tollazatuk is itt változott meg. A 12.nap után még pár grammot híznak,vagy pedig stagnálnak.
+
+
+# 2. A második lépés az, hogy kiszámoljuk, hogy milyen az egyes fészkekben az etetési aktivitása a hímeknek, és a tojóknak, majd megnézzük, hogy ezt milyen tényezők befolyásolják. Az etetési aktivitás az etetés mennyisége egy órára számítva. A stresszhatás , ami lehetett emberi, vagy más egyedtől származó,továbbá környezeti befolyasolta. Kezdjük a hímmel.
+
+```{r male}
+plot(frm~numb,data = coef,xlab = "Chicks",ylab = "MaleFR")
+m14=lm(frm~numb,data = coef)
+abline(m14)
+summary(m14)
+```
+
+# Következzenek a tojók.
+```{r female}
+plot(numb~frfm,data = coef,xlab = "chicks",ylab = "FemaleFR")
+m3=lm(numb~frfm,data = coef)
+abline(m3)
+summary(m3)
+```
+#Az etetési ráta vajon függ-e a fiökák számától? ha igen hogyan? vajon lehet erre kontrollálni?
+Az etetési aktivitás függ a fiókák számától. Minél több a fióka, annál több az etetés.Fontos megjegyezni,hogy ez azonban nem sziginifikáns.Főleg a hímnél nem.
+
+A tojóknál szépen látszik, hogy egyenletesen növekszik az etetési aktivitás,minél több fióka van. Vannak azonban szélsőséges esetek, pl  ahol 7 fióka van, ott a tojó csak 4x etetett. Ahol 3 ott meg van hogy 17x. Ez  azért volt mert ennél a megfigyelésnél éppen egy nyugdíjas csoport vonult el, illetve az eső is szemerkélt , és láthatólag a tojókra ezek nagyobb stresszel jártak,óvatosabban etettek.A hímekre az emberek általi stressz nem volt szignifikáns hatással, nem változott az etetési aktivitás, azonban a harcok viszonylag lelassították. A hímek ábráján az látszik, hogy különösebben nem érdekelte őket , hogy mennyi fióka van, nagyjából ugyanannyit etettek 2 fiókás odúknál, meg a  7 fiókás odúknál is. 
+
+#3. Mi befolyásolhatja még a növekedésüket?
+
+Születésük dátuma, időjárás, stresszhatás, fiókák száma, elhelyezkedés. Ezek azok amik befolyásolják a növekedést, és ezzel együtt az etetési aktivitást.
+
+Mégis a legnagyobb hatással a környezeti elhelyezkedés volt  3 csoportba osztottam,  amik közvetlenül az út mentén voltak, villanyoszlopokon, többnyire 1-es típusú. Amik az utaktol nem messze, de azért olyan helyen ahol ritkán közlekednek emberek. Ilyen például a tónál lévő odú, vagy  az emberek által létrehozott , füveken letaposott ösvények amik többnyire két beton utat kötnek össze.Ezek a 2-es típusú fészkek. A 3. ami soha , vagy  nagyon ritkán kerül megzavarásra emberek által. Ezek bent vannak az erdős részeken, alig észrevehető helyeken.Az egyes típusú odúknál 33 fiókából 28 repült ki, azaz 5 halt meg. A kettes típusúnál 22ből 18 repült ki , azaz 4 halt meg.Tehát ezek között nincs nagy eltérés. A beton utak miatt,  amik körül rengeteg virág van könnyű élelmet szerezni, továbbá a tiszta környezet miatt betegségek is ritkák, kevés a parazitát terjesztő / parazita faj. Ezzel szemben a 3. típusú odúknál 33 fiókából csupán 16 repült ki.Ezeknél az odúknál rengeteg a kullancslégy, hemzsegnek a szúnyogok, a fiókákban rengeteg élősködő férget találtam , amik szívták a vérüket.A vérvételnél ezeknél a fiókákbál külön volt a plazma a sejtektől. A fiókák soványak voltak, toll alig volt rajtuk , és betegesen gyengék voltak.
+
+
+
+
+```{r}
+plot(Environment$maxchick~Environment$env, xlab = "environment", ylab = "Maxchick")
+m5=lm(Environment$maxchick~Environment$env)
+abline(m5)
+summary(m5)
+```
+
+
+
+```{r}
+plot(Environment$finalchick~Environment$env, xlab = "environment", ylab = "Finalchick")
+m6=lm(Environment$finalchick~Environment$env)
+abline(m6)
+summary(m6)
+```
+
+Jól megfigyelhető a különbség.
+
+
+# Lássuk ábrázolva az összes fészek növekedési rátáját.
+``` {r Ábrázolva az összes fészek növekedési rátája}
+ggplot(chck,aes(day,mass))+geom_point()+facet_wrap(~nestboxid)
+
+```
+
+Ebből az látszik hogy nagyjából a 10.napig lineáris a növekedés. Megfigyelhető, hogy majdnem minden fészeknél vannak lemaradott pontok,azaz fiókák. Ezek később keltek ki, akár több mint 24-órával később. Nagyrészt a lemaradott fiókák elpusztultak, azonban 3-4 gramm eltérést még képesek kibírni , és felhozni a lemaradást a többi fiókához képest.
+
+#A következő pontokban kiszámítom a slope-ot a 6., 10., napig, továbbá az összes napra vonatkozóan is.
+```{r slope kiszámítása a 6. napig}
+slopes <- by(chck, INDICES = chck$nestboxid, FUN = function(x) coef(lm(mass~day, subset = day < 7, data = x))[2])
+
+```
+
+```{r slope kiszámítása a 10. napig}
+slopes1 <- by(chck, INDICES = chck$nestboxid, FUN = function(x) coef(lm(mass~day, subset = day < 11, data = x))[2])
+
+```
+
+```{r összesített slope}
+slopes2 <- by(chck, INDICES = chck$nestboxid, FUN = function(x) coef(lm(mass~day, subset = day < 17, data = x))[2])
+
+```
+
+# Fontos elkülöníteni a hím és a tojó etetési rátáját a következő számításokhoz.
+
+``` {r megfigyelésenként történt etetés, hímre és tojóra számítva}
+behav.table <- table(behav$ObsID, behav$Behavior, behav$Sex)
+
+```
+
+```{r Hím és tojó etetési rátája}
+beh <- behref
+
+beh$mfv <- behav.table[,1,"Male"]
+beh$ffv <- behav.table[,1,"Female"]
+beh$tfv <- rowSums(behav.table[,1,])
+
+```
+
+```{r}
+beh$growth <- slopes[match(beh$NestboxID, names(slopes))]
+beh$growth
+beh$growth1 =  slopes1[match(beh$NestboxID, names(slopes))]
+beh$growth1
+beh$growth2 =  slopes2[match(beh$NestboxID, names(slopes))]
+beh$growth2
+```
+# A kapott adatok alapján kiszámítottam a tojó etetési aktivitásához prediktált növekedést.
+``` {r tojó etetési aktivitásához prediktált növekedés}
+plot(growth2~ffv,data = beh, xlab = "Feeding rate (feeds/hour)", 
+     ylab = "Growth rate (daily mass gain - g)", main = "Female")
+```
+
+
+# Itt pedig a hím etetési aktivitásához prediktált növekedés látható.
+``` {r hím etetési aktivitásához prediktált növekedés}
+plot(growth2~mfv,data = beh, xlab = "Feeding rate (feeds/hour)",
+     ylab = "Growth rate (daily mass gain - g)", main = "Male")
+```
+
+# Végül pedig az összesített növekedés.
+```{r Összesített etetési aktivitáshoz prediktált növekedés}
+plot(growth2~tfv,data = beh, xlab = "Feeding rate (feeds/hour)", ylab = "Growth rate (daily mass gain - g)", main = "All in one")
+```
+
+#4. Mennyire befolyásolja az eredményeket, ha a növekedési ráta a 6. , illetve a 10. napig tart?Lássuk a 10. napig tartó növekedést.
+```{r 10.napig tartó növekedési ráta}
+plot(growth1~mfv, data = beh, xlab = "Feeding rate (feeds/hour)",ylab = "Growth rate (daily mass gain - g)", main = "Male")
+m8=lm(growth1~mfv,data = beh)
+abline(m8)
+plot(growth1~ffv, data = beh, xlab = "Feeding rate (feeds/hour)",ylab = "Growth rate (daily mass gain - g)", main = "Female")
+m9=lm(growth1~ffv,data = beh)
+abline(m9)
+plot(growth1~tfv, data = beh, xlab = "Feeding rate (feeds/hour)", 
+     ylab = "Growth rate (daily mass gain - g)", main = "All in one")
+m10=lm(growth1~tfv,data = beh)
+abline(m10)
+```
+
+#Itt pedig a 6. napig látható növekedés ábrázolása.
+
+```{r 6.napig tartó növekedési ráta}
+plot(growth~mfv,data = beh, xlab = "Feeding rate (feeds/hour)",ylab = "Growth rate (daily mass gain - g)", main = "Male")
+m11=lm(growth~mfv,data = beh)
+abline(m11)
+plot(growth~ffv,data = beh, xlab = "Feeding rate (feeds/hour)",ylab = "Growth rate (daily mass gain - g)", main = "Female")
+m12=lm(growth~ffv,data = beh)
+abline(m12)
+plot(growth~tfv,data = beh, xlab = "Feeding rate (feeds/hour)",ylab = "Growth rate (daily mass gain - g)", main = "All in one")
+m13=lm(growth~tfv,data = beh)
+abline(m13)
+```
+A 6.napig tartó növekedések során a növekedés gyorsabb ütemben fejlődik, a tojók, a hímek , és az összesített eredmények alapján is.Ennek az az oka, hogy a túlélés érdekében kikelés után a legfontosabb a gyors növekedés, hogy utána kompetensek legyenek a többi fiókával.Másrészről pedig a 10.nap után már majdnem elérték a maximális súlyukat, ezért lassabbodik.
+
+
+#5. A slope mennyire adhat reális képet a fiókák növekedéséről? Milyen zavaró hatások lehetnek, amire oda kellene figyelni?
+A slope teljesen reális képet ad, HA az átlagot tekintjük.Azonban sok esetben előfurdul, hogy a legnagyobb súlyú, és a legkisebb súlyú fióka között nagy az eltérés, ezért az eredmények kissé félrevezetőek, a valóságot nem fedik.Ennek az az oka, hogy egy fióka amelyik hamarabb kelt ki, hatalmas előnnyel indul a később kikelő társaihoz képest.Egyrészt már megkezdte a táplálkozást, és nagyobb súllyal rendelkezik, ezáltal több energiája is van és jobban tud a szülőknek jelet adni,másrészt előnyösebb pozíciót tud keresni magának.Ebből adódóan sok fészekben volt az ,hogy a nagyobb tömegű fiókák gyorsan tettek szert még több tömegre, ezzel szemben a kisebb tömegű fiókák egyre nehezebben , és lassabban szedtek fel grammokat.A másik zavaró tényező, hogy a fiókák száma változó, és előfordul hogy egy 7 fiókás fészekben, és egy 4 fiókás fészekben ugyanakkora az etetési aktivitás.Természetesen ilyenkor a növekedési ütem a 4 fiókás fészekben lesz a nagyobb.Zavaró hatás még, hogy nem tudjuk milyen táplálékot sikerül elkapniuk,és hogy ezek mekkora tápértékekkel rendelkeznek.
+
+# 6. Fetételezve, hogy mindent jól csináltunk, mit mondanak az eredmények? Befolyásolja-e az etetési aktivitás a fiókák növekedését? 
+
+Igen, befolyásolja.
+
+#7 Milyen tényezők befolyásolják  az etetési aktivitást? Melyik szülői nem az aktívabb etető?
+
+```{r feeding visit}
+mean(behav.table[,1,"Male"])
+mean(behav.table[,1,"Female"])
+sum(behav.table[,1,"Male"])
+sum(behav.table[,1,"Female"])
+
+```
+
+# Ezekből megtudhatjuk hogy a tojó összesen 119-szer,míg a hím 137-szer etetett, a hímek óránkénti 8,5 ös átlaggal, míg a tojók 7,4-es átlaggal. Tehát kimondható , hogy a hím az aktívabb etetési szempontból.
+
+# Vessünk egy pillantást a fészek közeli viselkedésekre. Ennek az etetésen kívül még 3 fajtája van. Az odú tetején való elhelyezkedés pár másodpercig, ez az OB jelölést kapta. A VI, azaz vicinity ami a fészek közelében történő mozgást jelenti. Ez lehet ágról ágra ugrándozás az odú közelében, vagy repkedés is. A 3. opció az OH ami az odú bejáratán elhelyezkedő madarat jelenti. Ezeket a tényezőket csak akkor számoltam bele hogyha több másodpercig tartott, nem csak megfordult ott a madár.
+
+``` {r egyéb tényezők}
+sum(behav.table[,2,"Male"])
+sum(behav.table[,2,"Female"])
+sum(behav.table[,3,"Male"])
+sum(behav.table[,3,"Female"])
+sum(behav.table[,4,"Male"])
+sum(behav.table[,4,"Female"])
+mean(behav.table[,2,"Male"])
+mean(behav.table[,3,"Male"])
+mean(behav.table[,4,"Male"])
+```
+
+# Láthatjuk, hogy igen jelentős az eltérés. Míg a hímek óránként 0,6-szor tartózkodnak az odún, 0,5 ször a bejárati lyukon , és 1,6-szor a közelben, addig a tojók az összes megfigyelés alapján csupán egyszer tartózkodott az odún, egyszer a lyukon , és 5-ször a közelben.
+# Ezek az adatok azt bizonyítják, hogy a hímek aktívabban vesznek részt minden folyamatban.
